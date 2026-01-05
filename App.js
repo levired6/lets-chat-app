@@ -25,31 +25,34 @@ const firebaseConfig = {
   appId: "1:960766217824:web:77c70f1c63577245007d05"
 };
 
+// This ensures the "auth" component is registered before the app renders.
+const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+
+// Initialize Auth with Persistence immediately
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
+});
+
+// Initialize Firestore
+const db = getFirestore(app);
+// -------------------------------------------------
+
 const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
-  const [db, setDb] = useState(null);
-  const [auth, setAuth] = useState(null);
+  // We keep the ready state to ensure the NavigationContainer doesn't 
+  // try to use the auth/db objects before they are fully assigned.
+  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
 
   useEffect(() => {
-    // 1. Initialize App
-    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-    
-    // 2. Initialize Auth with Persistence (This fixes the [runtime not ready] error)
-    const authInstance = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage)
-    });
-    
-    // 3. Initialize Firestore
-    const dbInstance = getFirestore(app);
-
-    setAuth(authInstance);
-    setDb(dbInstance);
+    if (auth && db) {
+      setIsFirebaseReady(true);
+    }
   }, []);
 
   // Safety Gate: If Firebase objects aren't created yet, show loading
-  if (!auth || !db) {
+  if (!isFirebaseReady) {
     return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
@@ -73,6 +76,5 @@ const App = () => {
     </NavigationContainer>
   );
 };
-
 
 export default App;
