@@ -39,7 +39,7 @@ const signInUser = () => {
         });
       })
       .catch((error) => {
-        console.error(error);
+        console.error("Auth Error:", error);
         Alert.alert("Unable to sign in, try again later.");
       });
   }

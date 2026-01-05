@@ -5,8 +5,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { getFirestore } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
-import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth"; // Add this import
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth } from "firebase/auth"; // Add this import
 // import react Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -25,51 +24,27 @@ const firebaseConfig = {
   appId: "1:960766217824:web:77c70f1c63577245007d05"
 };
 
-// This ensures the "auth" component is registered before the app renders.
+// Initialize Firebase once
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Auth with Persistence immediately
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(AsyncStorage)
-});
-
-// Initialize Firestore
+// Initialize services simply
 const db = getFirestore(app);
-// -------------------------------------------------
+const auth = getAuth(app); 
 
 const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
-  // We keep the ready state to ensure the NavigationContainer doesn't 
-  // try to use the auth/db objects before they are fully assigned.
-  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
-
-  useEffect(() => {
-    if (auth && db) {
-      setIsFirebaseReady(true);
-    }
-  }, []);
-
-  // Safety Gate: If Firebase objects aren't created yet, show loading
-  if (!isFirebaseReady) {
-    return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color="#0000ff" />
-      </View>
-    ); 
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start">
-          {/* 3. PASS AUTH AS A PROP TO START */}
+          {/* 3. PASS AUTH AS A PROP TO START PER DIRECTIONS */}
           {(props) => <Start auth={auth} {...props} />}
         </Stack.Screen>
 
         <Stack.Screen name="Chat">
-          {/* 3. PASS DB AS A PROP TO CHAT */}
+          {/* 3. PASS DB AS A PROP TO CHAT PER DIRECTIONS */}
           {(props) => (<Chat db={db} {...props} />)}
         </Stack.Screen>
       </Stack.Navigator>
