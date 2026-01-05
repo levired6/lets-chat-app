@@ -5,7 +5,8 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { getFirestore } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
-import { getAuth } from "firebase/auth"; // Add this import
+import { getAuth, initializeAuth, getReactNativePersistence } from "firebase/auth"; // Add this import
+import AsyncStorage from '@react-native-async-storage/async-storage';
 // import react Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -24,33 +25,32 @@ const firebaseConfig = {
   appId: "1:960766217824:web:77c70f1c63577245007d05"
 };
 
-// Initialize Firebase outside the component to prevent multiple initializations
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
-const db = getFirestore(app);
-const auth = getAuth(app);
-
 const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
 
 const App = () => {
-  // 1. Create a state to track if Firebase is ready
-  const [isFirebaseReady, setIsFirebaseReady] = useState(false);
+  const [db, setDb] = useState(null);
+  const [auth, setAuth] = useState(null);
 
   useEffect(() => {
-    // 2. Safety check to ensure Firebase objects exist before allowing the app to render
-   const checkFirebase = setInterval(() => {
-    if (auth && db) {
-      setIsFirebaseReady(true);
-      clearInterval(checkFirebase);
-      }
-    }, 1000);
-return () => clearInterval(checkFirebase);
+    // 1. Initialize App
+    const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
+    
+    // 2. Initialize Auth with Persistence (This fixes the [runtime not ready] error)
+    const authInstance = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage)
+    });
+    
+    // 3. Initialize Firestore
+    const dbInstance = getFirestore(app);
+
+    setAuth(authInstance);
+    setDb(dbInstance);
   }, []);
 
-  // 3. THE "SAFETY GATE": If not ready, show a blank screen.
-  // This prevents the [runtime not ready] error from appearing.
-  if (!isFirebaseReady) {
-return (
+  // Safety Gate: If Firebase objects aren't created yet, show loading
+  if (!auth || !db) {
+    return (
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
         <ActivityIndicator size="large" color="#0000ff" />
       </View>
