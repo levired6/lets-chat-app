@@ -37,6 +37,7 @@ const signInUser = () => {
             name: name, 
             color: color 
         });
+        Alert.alert("Signed in successfully");
       })
       .catch((error) => {
         console.error("Auth Error:", error);

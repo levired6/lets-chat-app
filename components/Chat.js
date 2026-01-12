@@ -50,14 +50,7 @@ const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
     }, [db, name]);
 
 const onSend = (newMessages) => {
-        // Use addDoc to save the first item in newMessages
-        addDoc(collection(db, "messages"), {
-            ...newMessages[0],
-            createdAt: new Date() // Ensure a fresh Date object is sent
-        }).catch((error) => {
-            console.error("Firestore Error:", error);
-            Alert.alert("Error", "Could not send message.");
-        });
+        addDoc(collection(db, "messages"), newMessages[0]);
     };
     
     const renderBubble = (props) => {
