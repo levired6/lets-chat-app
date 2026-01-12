@@ -38,7 +38,7 @@ const q = query(collection(db, "messages"), orderBy("createdAt", "desc"));
                 const data = doc.data();
                 // Convert TimeStamp to Date object
                     newMessages.push({
-                        id: doc.id,
+                        _id: doc.id,
                         ...data,
                         createdAt: data.createdAt ? new Date(data.createdAt.toMillis()) : new Date(),
                     });

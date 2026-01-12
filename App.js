@@ -5,7 +5,7 @@ import { initializeApp, getApps, getApp } from "firebase/app";
 // https://firebase.google.com/docs/web/setup#available-libraries
 import { getFirestore } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
-import { getAuth } from "firebase/auth"; // Add this import
+import { initializeAuth, getReactNativePersistence } from "firebase/auth"; // Add this import
 // import react Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
@@ -29,7 +29,10 @@ const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Initialize services simply
 const db = getFirestore(app);
-const auth = getAuth(app); 
+// Initialize Auth with Persistence to fix the "Component auth has not been registered" error
+const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
+});
 
 const Stack = createNativeStackNavigator();
 LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
