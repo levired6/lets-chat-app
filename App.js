@@ -1,18 +1,26 @@
 //App.js
-import { useState, useEffect } from 'react';
-import { initializeApp, getApps, getApp } from "firebase/app";
+import { useEffect } from 'react';
+import { initializeApp } from "firebase/app";
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
-import { getFirestore } from "firebase/firestore";
+import { disableNetwork, enableNetwork, getFirestore } from "firebase/firestore";
 // Import the functions you need from the SDKs you need
-import { initializeAuth, getReactNativePersistence } from "firebase/auth"; // Add this import
+import { Alert } from 'react-native';
 // import react Navigation
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 // import the screens
 import Start from './components/Start';
 import Chat from './components/Chat';
-import { LogBox, View, ActivityIndicator } from 'react-native';
+import { LogBox } from 'react-native';
+import { getStorage } from 'firebase/storage';
+
+const Stack = createNativeStackNavigator();
+LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+
+// Initialize Firebase once
+const App = () => {
+  const connectionStatus = useNetInfo();
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -24,20 +32,22 @@ const firebaseConfig = {
   appId: "1:960766217824:web:77c70f1c63577245007d05"
 };
 
-// Initialize Firebase once
-const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
+ // Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // Initialize services simply
 const db = getFirestore(app);
-// Initialize Auth with Persistence to fix the "Component auth has not been registered" error
-const auth = initializeAuth(app, {
-  persistence: getReactNativePersistence(ReactNativeAsyncStorage)
-});
+const storage = getStorage(app);
 
-const Stack = createNativeStackNavigator();
-LogBox.ignoreLogs(["AsyncStorage has been extracted from"]);
+  useEffect(() => {
+    if (connectionStatus.isConnected === false) {
+      Alert.alert("Connection lost")
+      disableNetwork(db);
+    } else if (connectionStatus.isConnected === true) {
+      enableNetwork(db);
+    }
+  }, [connectionStatus.isConnected]);
 
-const App = () => {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Start">

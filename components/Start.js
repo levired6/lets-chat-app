@@ -10,24 +10,15 @@ import {
   TouchableOpacity,
   Alert 
 } from 'react-native';
-import { signInAnonymously } from "firebase/auth";
+import { getAuth, signInAnonymously } from "firebase/auth";
 
 // Import the background image asset
 const image = require('../assets/Background-Image.png');
 
-// Define the available background colors
-const backgroundColors = {
-  black: '#090C08',
-  purple: '#474056',
-  gray: '#8A95A5',
-  green: '#B9C6AE',
-};
 
-const Start = ({ navigation, auth }) => {
-  const [name, setName] = useState('');
-  const [color, setColor] = useState(backgroundColors.black);
-  
-const signInUser = () => {
+const Start = ({ navigation }) => {
+  const auth = getAuth();
+  const signInUser = () => {
     // Call signInAnonymously per directions
     signInAnonymously(auth)
       .then(result => {
@@ -44,6 +35,16 @@ const signInUser = () => {
         Alert.alert("Unable to sign in, try again later.");
       });
   }
+
+    const [name, setName] = useState('');
+  const [color, setColor] = useState(backgroundColors.black);
+  // Define the available background colors
+const backgroundColors = {
+  black: '#090C08',
+  purple: '#474056',
+  gray: '#8A95A5',
+  green: '#B9C6AE',
+};
 
   return (
     <ImageBackground style={styles.imageBackground} source={image}>
