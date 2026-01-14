@@ -1,28 +1,30 @@
+// Start.js
 import { useState } from 'react';
 import { 
-  StyleSheet, 
-  View, 
-  Text, 
-  TextInput, 
-  ImageBackground, 
-  KeyboardAvoidingView,
-  Platform,
-  TouchableOpacity,
-  Alert 
+  StyleSheet, View, Text, TextInput, ImageBackground, 
+  KeyboardAvoidingView, Platform, TouchableOpacity, Alert 
 } from 'react-native';
 import { getAuth, signInAnonymously } from "firebase/auth";
 
-// Import the background image asset
 const image = require('../assets/Background-Image.png');
 
+const backgroundColors = {
+  black: '#090C08',
+  purple: '#474056',
+  gray: '#8A95A5',
+  green: '#B9C6AE',
+};
 
-const Start = ({ navigation }) => {
-  const auth = getAuth();
+const Start = ({ navigation, firebaseApp }) => {
+  const [name, setName] = useState('');
+  const [color, setColor] = useState(backgroundColors.black);
+  
   const signInUser = () => {
-    // Call signInAnonymously per directions
+    // THE FIX: Pass the firebaseApp prop into getAuth
+   const auth = getAuth(firebaseApp);
+
     signInAnonymously(auth)
       .then(result => {
-        // Navigate with uid, name, and color
         navigation.navigate('Chat', { 
             userID: result.user.uid, 
             name: name, 
@@ -32,19 +34,9 @@ const Start = ({ navigation }) => {
       })
       .catch((error) => {
         console.error("Auth Error:", error);
-        Alert.alert("Unable to sign in, try again later.");
+        Alert.alert("Unable to sign in. Please try again.");
       });
   }
-
-    const [name, setName] = useState('');
-  const [color, setColor] = useState(backgroundColors.black);
-  // Define the available background colors
-const backgroundColors = {
-  black: '#090C08',
-  purple: '#474056',
-  gray: '#8A95A5',
-  green: '#B9C6AE',
-};
 
   return (
     <ImageBackground style={styles.imageBackground} source={image}>
@@ -83,7 +75,6 @@ const backgroundColors = {
   );
 }
 
-// ... styles remain the same as your provided code ...
 const styles = StyleSheet.create({
   imageBackground: {
     flex: 1,
@@ -126,7 +117,6 @@ const styles = StyleSheet.create({
     borderRadius: 5,
     fontSize: 16,
     fontWeight: '300',
-    opacity: 0.5,
     marginBottom: 20,
   },
   chooseColorText: {
@@ -147,7 +137,6 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    marginHorizontal: 10,
   },
   colorSelected: {
     borderWidth: 4,
