@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "lets-chat",
-    "slug": "lets-chat",
+    "name": "lets-chat-app",
+    "slug": "lets-chat-app-5eab0",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

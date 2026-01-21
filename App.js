@@ -20,6 +20,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 const db = getFirestore(app);
+const auth = getAuth(app);
 
 
 const Stack = createNativeStackNavigator();
@@ -31,7 +32,7 @@ const App = () => {
       <Stack.Navigator initialRouteName="Start">
         <Stack.Screen name="Start">
           {/* We pass the 'app' variable explicitly here */}
-          {(props) => <Start firebaseApp={app} {...props} />}
+          {(props) => <Start auth={auth} {...props} />}
         </Stack.Screen>
         <Stack.Screen name="Chat">
           {(props) => <Chat db={db} {...props} />}

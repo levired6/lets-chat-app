@@ -15,13 +15,11 @@ const backgroundColors = {
   green: '#B9C6AE',
 };
 
-const Start = ({ navigation, firebaseApp }) => {
+const Start = ({ navigation, auth }) => {
   const [name, setName] = useState('');
   const [color, setColor] = useState(backgroundColors.black);
   
   const signInUser = () => {
-    // THE FIX: Pass the firebaseApp prop into getAuth
-   const auth = getAuth(firebaseApp);
 
     signInAnonymously(auth)
       .then(result => {
@@ -29,12 +27,10 @@ const Start = ({ navigation, firebaseApp }) => {
             userID: result.user.uid, 
             name: name, 
             color: color 
-        });
-        Alert.alert("Signed in successfully");
+});
       })
       .catch((error) => {
-        console.error("Auth Error:", error);
-        Alert.alert("Unable to sign in. Please try again.");
+        Alert.alert("Unable to sign in. Make sure Anonymous Auth is enabled in the Firebase Console!");
       });
   }
 
